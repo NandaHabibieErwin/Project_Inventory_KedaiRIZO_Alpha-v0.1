@@ -12,5 +12,7 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Data
         }
         public DbSet<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori> Kategori { get; set; } = default!;
         public DbSet<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product> Product { get; set; } = default!;
+        public DbSet<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi> Data_Transaksi { get; set; } = default!;
+        public DbSet<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Detail_Transaksi> Detail_Transaksi { get; set; } = default!;
     }
 }

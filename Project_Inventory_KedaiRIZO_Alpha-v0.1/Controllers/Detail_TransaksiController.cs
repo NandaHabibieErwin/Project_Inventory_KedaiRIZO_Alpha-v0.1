@@ -10,23 +10,23 @@ using Project_Inventory_KedaiRIZO_Alpha_v0._1.Models;
 
 namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
 {
-    public class ProductsController : Controller
+    public class Detail_TransaksiController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context)
+        public Detail_TransaksiController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Products
+        // GET: Detail_Transaksi
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Product.Include(p => p.Id_Kategori);
+            var applicationDbContext = _context.Detail_Transaksi.Include(d => d.DataTransaksi).Include(d => d.Product);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Products/Details/5
+        // GET: Detail_Transaksi/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,30 +34,32 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .Include(p => p.Id_Kategori)
+            var detail_Transaksi = await _context.Detail_Transaksi
+                .Include(d => d.DataTransaksi)
+                .Include(d => d.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
+            if (detail_Transaksi == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(detail_Transaksi);
         }
 
-        // GET: Products/Create
+        // GET: Detail_Transaksi/Create
         public IActionResult Create()
         {
-            ViewData["KategoriID"] = new SelectList(_context.Kategori, "Id", "Nama_Kategori");
+            ViewData["DataTransaksiId"] = new SelectList(_context.Data_Transaksi, "Id", "Id");
+            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id");
             return View();
         }
 
-        // POST: Products/Create
+        // POST: Detail_Transaksi/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Product_Name,harga,stock,KategoriID")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,DataTransaksiId,ProductId,Quantity,total")] Detail_Transaksi detail_Transaksi)
         {
             if (!ModelState.IsValid)
             {
@@ -73,15 +75,16 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
             }
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(detail_Transaksi);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KategoriID"] = new SelectList(_context.Kategori, "Id", "Nama_Kategori");
-            return View(product);
+            ViewData["DataTransaksiId"] = new SelectList(_context.Data_Transaksi, "Id", "Id", detail_Transaksi.DataTransaksiId);
+            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id", detail_Transaksi.ProductId);
+            return View(detail_Transaksi);
         }
 
-        // GET: Products/Edit/5
+        // GET: Detail_Transaksi/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,23 +92,24 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
-            if (product == null)
+            var detail_Transaksi = await _context.Detail_Transaksi.FindAsync(id);
+            if (detail_Transaksi == null)
             {
                 return NotFound();
             }
-            ViewData["KategoriID"] = new SelectList(_context.Kategori, "Id", "Nama_Kategori");
-            return View(product);
+            ViewData["DataTransaksiId"] = new SelectList(_context.Data_Transaksi, "Id", "Id", detail_Transaksi.DataTransaksiId);
+            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id", detail_Transaksi.ProductId);
+            return View(detail_Transaksi);
         }
 
-        // POST: Products/Edit/5
+        // POST: Detail_Transaksi/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Product_Name,harga,stock,KategoriID")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DataTransaksiId,ProductId,Quantity,total")] Detail_Transaksi detail_Transaksi)
         {
-            if (id != product.Id)
+            if (id != detail_Transaksi.Id)
             {
                 return NotFound();
             }
@@ -114,12 +118,12 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    _context.Update(detail_Transaksi);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.Id))
+                    if (!Detail_TransaksiExists(detail_Transaksi.Id))
                     {
                         return NotFound();
                     }
@@ -130,11 +134,12 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KategoriID"] = new SelectList(_context.Kategori, "Id", "Nama_Kategori");
-            return View(product);
+            ViewData["DataTransaksiId"] = new SelectList(_context.Data_Transaksi, "Id", "Id", detail_Transaksi.DataTransaksiId);
+            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id", detail_Transaksi.ProductId);
+            return View(detail_Transaksi);
         }
 
-        // GET: Products/Delete/5
+        // GET: Detail_Transaksi/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,35 +147,36 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .Include(p => p.Id_Kategori)
+            var detail_Transaksi = await _context.Detail_Transaksi
+                .Include(d => d.DataTransaksi)
+                .Include(d => d.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
+            if (detail_Transaksi == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(detail_Transaksi);
         }
 
-        // POST: Products/Delete/5
+        // POST: Detail_Transaksi/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            if (product != null)
+            var detail_Transaksi = await _context.Detail_Transaksi.FindAsync(id);
+            if (detail_Transaksi != null)
             {
-                _context.Product.Remove(product);
+                _context.Detail_Transaksi.Remove(detail_Transaksi);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
+        private bool Detail_TransaksiExists(int id)
         {
-            return _context.Product.Any(e => e.Id == id);
+            return _context.Detail_Transaksi.Any(e => e.Id == id);
         }
     }
 }

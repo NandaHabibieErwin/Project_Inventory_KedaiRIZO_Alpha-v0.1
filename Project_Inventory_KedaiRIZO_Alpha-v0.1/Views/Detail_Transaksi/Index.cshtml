@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product>
+﻿@model IEnumerable<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Detail_Transaksi>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,16 +13,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Product_Name)
+                @Html.DisplayNameFor(model => model.DataTransaksi)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.harga)
+                @Html.DisplayNameFor(model => model.Product)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.stock)
+                @Html.DisplayNameFor(model => model.Quantity)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Id_Kategori.Nama_Kategori)
+                @Html.DisplayNameFor(model => model.total)
             </th>
             <th></th>
         </tr>
@@ -31,16 +31,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Product_Name)
+                @Html.DisplayFor(modelItem => item.DataTransaksi.Id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.harga)
+                @Html.DisplayFor(modelItem => item.Product.Product_Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.stock)
+                @Html.DisplayFor(modelItem => item.Quantity)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Id_Kategori.Nama_Kategori)
+                @Html.DisplayFor(modelItem => item.total)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

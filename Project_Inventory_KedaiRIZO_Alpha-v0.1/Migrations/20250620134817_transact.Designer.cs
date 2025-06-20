@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project_Inventory_KedaiRIZO_Alpha_v0._1.Data;
 
@@ -11,9 +12,11 @@ using Project_Inventory_KedaiRIZO_Alpha_v0._1.Data;
 namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250620134817_transact")]
+    partial class transact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,9 +238,6 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Migrations
                     b.Property<DateTime>("Tanggal")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TotalAmount")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -247,35 +247,6 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Data_Transaksi");
-                });
-
-            modelBuilder.Entity("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Detail_Transaksi", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DataTransaksiId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("total")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DataTransaksiId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Detail_Transaksi");
                 });
 
             modelBuilder.Entity("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori", b =>
@@ -385,25 +356,6 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Detail_Transaksi", b =>
-                {
-                    b.HasOne("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi", "DataTransaksi")
-                        .WithMany("Details")
-                        .HasForeignKey("DataTransaksiId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product", "Id_Produk")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DataTransaksi");
-
-                    b.Navigation("Id_Produk");
-                });
-
             modelBuilder.Entity("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product", b =>
                 {
                     b.HasOne("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori", "Id_Kategori")
@@ -413,11 +365,6 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Migrations
                         .IsRequired();
 
                     b.Navigation("Id_Kategori");
-                });
-
-            modelBuilder.Entity("Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi", b =>
-                {
-                    b.Navigation("Details");
                 });
 #pragma warning restore 612, 618
         }
