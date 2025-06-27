@@ -1,6 +1,82 @@
 ﻿@model IEnumerable<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi>
 
 @{
+    ViewData["Title"] = "Daftar Transaksi";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Transaksi Baru
+        </a>
+    </p>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Tanggal</th>
+                            <th>Total Items</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.ApplicationUser?.UserName</td>
+                                <td>@item.Tanggal.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <span class="badge bg-info">@item.Details.Count items</span>
+                                </td>
+                                <td>
+                                    <strong>Rp @item.TotalAmount.ToString("N0")</strong>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-4">
+                    <p class="text-muted">Belum ada transaksi.</p>
+                    <a asp-action="Create" class="btn btn-primary">Tambah Transaksi Pertama</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+}
+@*
+@model IEnumerable<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi>
+
+@{
     ViewData["Title"] = "Index";
 }
 
@@ -45,3 +121,4 @@
 }
     </tbody>
 </table>
+*@

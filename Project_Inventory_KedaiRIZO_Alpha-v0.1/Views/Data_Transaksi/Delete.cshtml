@@ -1,6 +1,115 @@
 ﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
 
 @{
+    ViewData["Title"] = "Hapus Transaksi";
+}
+
+<div class="container">
+    <h2 class="text-danger">@ViewData["Title"]</h2>
+
+    <div class="alert alert-warning">
+        <h5><i class="fas fa-exclamation-triangle"></i> Peringatan!</h5>
+        <p class="mb-0">Anda akan menghapus transaksi ini. Tindakan ini tidak dapat dibatalkan dan akan mengembalikan stock produk.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Detail Transaksi yang akan dihapus</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID Transaksi:</dt>
+                        <dd class="col-sm-9">@Model.Id</dd>
+
+                        <dt class="col-sm-3">User:</dt>
+                        <dd class="col-sm-9">@Model.ApplicationUser?.UserName</dd>
+
+                        <dt class="col-sm-3">Tanggal:</dt>
+                        <dd class="col-sm-9">@Model.Tanggal.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-3">Total Amount:</dt>
+                        <dd class="col-sm-9"><strong>Rp @Model.TotalAmount.ToString("N0")</strong></dd>
+                    </dl>
+
+                    @if (Model.Details.Any())
+                    {
+                        <h6 class="mt-4">Produk yang akan dikembalikan stock-nya:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-end">Total Harga</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in Model.Details)
+                                    {
+                                        <tr>
+                                            <td>@detail.Product?.Product_Name</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary">@detail.Quantity</span>
+                                            </td>
+                                            <td class="text-end">Rp @detail.total.ToString("N0")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">Konfirmasi Penghapusan</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-danger"><strong>Tindakan ini akan:</strong></p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Mengembalikan stock produk</li>
+                        <li><i class="fas fa-times text-danger"></i> Menghapus transaksi secara permanen</li>
+                        <li><i class="fas fa-times text-danger"></i> Menghapus semua detail transaksi</li>
+                    </ul>
+
+                    <form asp-action="Delete" class="mt-3">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Ya, Hapus Transaksi
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6>Ringkasan Pengembalian Stock:</h6>
+                    <small class="text-muted">
+                        Total @Model.Details.Sum(d => d.Quantity) items akan dikembalikan ke stock masing-masing produk.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+}
+@*
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
+
+@{
     ViewData["Title"] = "Delete";
 }
 
@@ -37,3 +146,4 @@
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+*@

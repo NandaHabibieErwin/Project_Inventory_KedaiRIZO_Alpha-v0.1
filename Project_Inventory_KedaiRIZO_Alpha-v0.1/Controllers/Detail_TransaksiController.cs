@@ -73,8 +73,15 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
                     }
                 }
             }
-            if (ModelState.IsValid)
+            var product = await _context.Product.FindAsync(detail_Transaksi.ProductId);
+            if (detail_Transaksi.Quantity > product.stock)
             {
+                ModelState.AddModelError("Quantity", "Stock tidak cukup.");
+            }
+            if (ModelState.IsValid)
+            { 
+                product.stock -= detail_Transaksi.Quantity;
+               
                 _context.Add(detail_Transaksi);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

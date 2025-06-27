@@ -3,6 +3,226 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Kedai RIZO Inventory</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-4" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-shop me-2"></i>Kedai RIZO
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link px-3" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house-door me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-box-seam me-1"></i>Inventory
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-area="" asp-controller="Products" asp-action="Index">
+                                <i class="bi bi-boxes me-2"></i>Produk
+                            </a></li>
+                            <li><a class="dropdown-item" asp-area="" asp-controller="Kategoris" asp-action="Index">
+                                <i class="bi bi-tags me-2"></i>Kategori
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-receipt me-1"></i>Transaksi
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-area="" asp-controller="Data_Transaksi" asp-action="Index">
+                                <i class="bi bi-list-ul me-2"></i>Data Transaksi
+                            </a></li>
+                            <li><a class="dropdown-item" asp-area="" asp-controller="Detail_Transaksi" asp-action="Index">
+                                <i class="bi bi-file-earmark-text me-2"></i>Detail Transaksi
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <!-- User Profile Section -->
+                <div class="d-flex align-items-center">
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar for larger screens -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse shadow-sm d-none d-md-block" style="min-height: calc(100vh - 76px);">
+                <div class="position-sticky pt-3">
+                    <div class="px-3 mb-3">
+                        <h6 class="text-muted text-uppercase fw-bold small">Menu Utama</h6>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-speedometer2 me-3 text-primary"></i>Dashboard
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="px-3 mb-2 mt-4">
+                        <h6 class="text-muted text-uppercase fw-bold small">Inventory</h6>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Products" asp-action="Index">
+                                <i class="bi bi-boxes me-3 text-success"></i>Produk
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Kategoris" asp-action="Index">
+                                <i class="bi bi-tags me-3 text-info"></i>Kategori
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="px-3 mb-2 mt-4">
+                        <h6 class="text-muted text-uppercase fw-bold small">Transaksi</h6>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Data_Transaksi" asp-action="Index">
+                                <i class="bi bi-receipt me-3 text-warning"></i>Data Transaksi
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Detail_Transaksi" asp-action="Index">
+                                <i class="bi bi-file-earmark-text me-3 text-danger"></i>Detail Transaksi
+                            </a>
+                        </li>
+                    </ul>
+
+                    <hr class="my-4">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-check me-3 text-secondary"></i>Privacy
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="py-4">
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb bg-white px-3 py-2 rounded shadow-sm">
+                            <li class="breadcrumb-item">
+                                <a  class="text-decoration-none">
+                                    <i class="bi bi-house-door me-1"></i>Home
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Page Header -->
+                    <!--<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                        <h1 class="h2 fw-bold text-dark">@ViewData["Title"]</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-download me-1"></i>Export
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-printer me-1"></i>Print
+                                </button>
+                            </div>
+                        </div>
+                    </div>-->
+
+                    <!-- Main Content Area -->
+                    <div class="bg-white rounded shadow-sm p-4">
+                        @RenderBody()
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-top mt-5">
+        <div class="container-fluid px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted small">
+                        &copy; 2025 Kedai RIZO Inventory Management System
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a  class="text-muted text-decoration-none small me-3" asp-area="" asp-controller="Home" asp-action="Privacy">
+                        <i class="bi bi-shield-check me-1"></i>Privacy Policy
+                    </a>
+                    <span class="text-muted small">v0.1 Alpha</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <style>
+        .sidebar .nav-link:hover {
+            background-color: #f8f9fa;
+            transform: translateX(2px);
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: #e3f2fd;
+            color: #1976d2 !important;
+            border-left: 3px solid #1976d2;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            font-weight: bold;
+        }
+        
+        @@media (max-width: 767.98px) {
+            .sidebar {
+                display: none !important;
+            }
+        }
+    </style>
+</body>
+</html>
+
+@*<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Project_Inventory_KedaiRIZO_Alpha_v0._1</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -58,5 +278,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
+*@

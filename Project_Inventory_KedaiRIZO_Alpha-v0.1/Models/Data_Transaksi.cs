@@ -7,8 +7,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Models
 {
+    public class ApplicationUser : IdentityUser
+    {
+
+    }
     public class Data_Transaksi
     {
+
         public int Id { get; set; }
         public string UserId { get; set; }
         [ForeignKey("UserId")]

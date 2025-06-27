@@ -1,6 +1,148 @@
 ﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
 
 @{
+    ViewData["Title"] = "Detail Transaksi";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"] #@Model.Id</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informasi Transaksi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">ID Transaksi:</dt>
+                                <dd class="col-sm-8">@Model.Id</dd>
+
+                                <dt class="col-sm-4">User:</dt>
+                                <dd class="col-sm-8">@Model.ApplicationUser?.UserName</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Tanggal:</dt>
+                                <dd class="col-sm-8">@Model.Tanggal.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                <dt class="col-sm-4">Total Items:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info">@Model.Details.Sum(d => d.Quantity) items</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Detail Produk</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Details.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-end">Harga Satuan</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in Model.Details)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@detail.Product?.Product_Name</strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary">@detail.Quantity</span>
+                                            </td>
+                                            <td class="text-end">
+                                                Rp @((detail.total / detail.Quantity).ToString("N0"))
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>Rp @detail.total.ToString("N0")</strong>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-info">
+                                    <tr>
+                                        <td colspan="2"><strong>Total Keseluruhan</strong></td>
+                                        <td class="text-end"><strong>@Model.Details.Sum(d => d.Quantity) items</strong></td>
+                                        <td class="text-end"><strong>Rp @Model.TotalAmount.ToString("N0")</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">Tidak ada detail produk untuk transaksi ini.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ringkasan</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Jumlah Item:</span>
+                        <strong>@Model.Details.Count produk</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Quantity:</span>
+                        <strong>@Model.Details.Sum(d => d.Quantity) pcs</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="h6">Total Pembayaran:</span>
+                        <strong class="h5 text-success">Rp @Model.TotalAmount.ToString("N0")</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit Transaksi
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Hapus Transaksi
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+}
+@*
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
+
+@{
     ViewData["Title"] = "Details";
 }
 
@@ -34,3 +176,4 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+*@

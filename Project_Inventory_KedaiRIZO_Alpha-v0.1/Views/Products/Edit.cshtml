@@ -1,4 +1,291 @@
 ﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <!-- Header Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-edit text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <h2 class="card-title mb-2 fw-bold text-warning">Edit Product</h2>
+                    <p class="text-muted mb-0">Update the product information below to modify your inventory</p>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-warning text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-box-open me-2"></i>Product Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Please correct the errors below.
+                        </div>
+
+                        <!-- Hidden ID field -->
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row g-4">
+                            <!-- Product Name -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input asp-for="Product_Name" class="form-control form-control-lg" id="productName" placeholder="Enter product name" />
+                                    <label asp-for="Product_Name" class="form-label">
+                                        <i class="fas fa-tag me-2"></i>Product Name
+                                    </label>
+                                    <span asp-validation-for="Product_Name" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Price and Stock Row -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="harga" class="form-control form-control-lg" id="productPrice" placeholder="0.00" />
+                                    <label asp-for="harga" class="form-label">
+                                        <i class="fas fa-dollar-sign me-2"></i>Price (IDR)
+                                    </label>
+                                    <span asp-validation-for="harga" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="stock" class="form-control form-control-lg" id="productStock" placeholder="0" />
+                                    <label asp-for="stock" class="form-label">
+                                        <i class="fas fa-cubes me-2"></i>Stock Quantity
+                                    </label>
+                                    <span asp-validation-for="stock" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-12">
+                                <label asp-for="KategoriID" class="form-label fw-semibold mb-2">
+                                    <i class="fas fa-list me-2"></i>Category
+                                </label>
+                                <select asp-for="KategoriID" class="form-select form-select-lg" asp-items="ViewBag.KategoriID">
+                                    <option value="" disabled>Select a category...</option>
+                                </select>
+                                <span asp-validation-for="KategoriID" class="invalid-feedback d-block"></span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                                    </a>
+                                    <div class="d-grid gap-2 d-md-flex">
+                                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info btn-lg me-md-2 px-4">
+                                            <i class="fas fa-eye me-2"></i>View Details
+                                        </a>
+                                        <button type="submit" class="btn btn-warning btn-lg px-5">
+                                            <i class="fas fa-save me-2"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Product Info Card -->
+            <div class="card border-0 mt-4 bg-light">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-info-circle text-warning"></i>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted">
+                                <strong>Note:</strong> You are editing product ID <strong>@Model.Id</strong>. Any changes will be immediately reflected in your inventory system.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Modified Info (if you have this data) -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Product ID: <span class="badge bg-secondary">@Model.Id</span>
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-pencil-alt me-1"></i>
+                            Editing Mode
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%);
+    }
+
+    .text-warning {
+        color: #ff7043 !important;
+    }
+
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        opacity: .65;
+        transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    .form-control:focus {
+        border-color: #ffa726;
+        box-shadow: 0 0 0 0.2rem rgba(255, 167, 38, 0.25);
+    }
+
+    .form-select:focus {
+        border-color: #ffa726;
+        box-shadow: 0 0 0 0.2rem rgba(255, 167, 38, 0.25);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 167, 38, 0.4);
+        color: white;
+    }
+
+    .btn-outline-info:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+
+    /* Animation for form fields with existing values */
+    .form-floating > .form-control:not(:placeholder-shown) {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        opacity: .65;
+        transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const validationSummary = document.querySelector('[asp-validation-summary]');
+
+            // Show validation summary if it has content
+            if (validationSummary && validationSummary.children.length > 0) {
+                validationSummary.classList.remove('d-none');
+            }
+
+            // Highlight fields that have been pre-populated
+            const inputs = form.querySelectorAll('input:not([type="hidden"]), select');
+            inputs.forEach(input => {
+                // Mark existing values as valid
+                if (input.value && input.value.trim() !== '') {
+                    input.classList.add('is-valid');
+                }
+
+                // Add real-time validation feedback
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('is-valid');
+                        this.classList.remove('is-invalid');
+                    }
+                });
+
+                input.addEventListener('invalid', function() {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                });
+            });
+
+            // Add confirmation before saving changes
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+                submitBtn.disabled = true;
+
+                // Re-enable after a delay in case of validation errors
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save Changes';
+                    submitBtn.disabled = false;
+                }, 3000);
+            });
+
+            // Warn user if they try to leave with unsaved changes
+        /*    let formChanged = false;
+            inputs.forEach(input => {
+                const originalValue = input.value;
+                input.addEventListener('input', function() {
+                    formChanged = (this.value !== originalValue);
+                });
+            });
+
+            window.addEventListener('beforeunload', function(e) {
+                if (formChanged) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });*/
+        });
+    </script>
+}
+@*
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product
 
 @{
     ViewData["Title"] = "Edit";
@@ -47,3 +334,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+*@

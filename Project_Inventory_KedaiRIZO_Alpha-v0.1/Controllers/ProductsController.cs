@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Project_Inventory_KedaiRIZO_Alpha_v0._1.Data;
 using Project_Inventory_KedaiRIZO_Alpha_v0._1.Models;
 
@@ -22,7 +23,9 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Product.Include(p => p.Id_Kategori);
+            // var applicationDbContext = _context.Product.Include(p => p.Kategori);
+            var applicationDbContext = _context.Product.Include(p => p.Kategori);
+            ViewData["KategoriID"] = new SelectList(_context.Kategori, "Id", "Nama_Kategori");
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +38,7 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
             }
 
             var product = await _context.Product
-                .Include(p => p.Id_Kategori)
+                .Include(p => p.Kategori)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -59,7 +62,9 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Product_Name,harga,stock,KategoriID")] Product product)
         {
-            if (!ModelState.IsValid)
+            Console.WriteLine($"KategoriID: {product.KategoriID}");
+
+            if (!ModelState.IsValid)    
             {
                 foreach (var modelError in ModelState)
                 {
@@ -143,7 +148,7 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
             }
 
             var product = await _context.Product
-                .Include(p => p.Id_Kategori)
+                .Include(p => p.Kategori)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {

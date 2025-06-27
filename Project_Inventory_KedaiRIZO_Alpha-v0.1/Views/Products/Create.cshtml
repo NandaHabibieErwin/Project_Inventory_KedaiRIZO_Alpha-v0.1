@@ -1,5 +1,198 @@
 ﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product
+@{
+    ViewData["Title"] = "Create Product";
+}
 
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <!-- Header Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-plus-circle text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h2 class="card-title mb-2 fw-bold text-primary">Add New Product</h2>
+                    <p class="text-muted mb-0">Fill in the details below to add a new product to your inventory</p>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-box me-2"></i>Product Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Please correct the errors below.
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Product Name -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input asp-for="Product_Name" class="form-control form-control-lg" id="productName" placeholder="Enter product name" />
+                                    <label asp-for="Product_Name" class="form-label">
+                                        <i class="fas fa-tag me-2"></i>Product Name
+                                    </label>
+                                    <span asp-validation-for="Product_Name" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Price and Stock Row -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="harga" class="form-control form-control-lg" id="productPrice" placeholder="0.00" />
+                                    <label asp-for="harga" class="form-label">
+                                        <i class="fas fa-dollar-sign me-2"></i>Price (IDR)
+                                    </label>
+                                    <span asp-validation-for="harga" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="stock" class="form-control form-control-lg" id="productStock" placeholder="0" />
+                                    <label asp-for="stock" class="form-label">
+                                        <i class="fas fa-cubes me-2"></i>Stock Quantity
+                                    </label>
+                                    <span asp-validation-for="stock" class="invalid-feedback d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-12">
+                                <label asp-for="KategoriID" class="form-label fw-semibold mb-2">
+                                    <i class="fas fa-list me-2"></i>Category
+                                </label>
+                                <select asp-for="KategoriID" class="form-select form-select-lg" asp-items="ViewBag.KategoriID">
+                                    <option value="" disabled selected>Select a category...</option>
+                                </select>
+                                <span asp-validation-for="KategoriID" class="invalid-feedback d-block"></span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg me-md-2 px-4">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                                        <i class="fas fa-plus-circle me-2"></i>Create Product
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="card border-0 mt-4 bg-light">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-info-circle text-info"></i>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted">
+                                <strong>Tip:</strong> Make sure to fill in all required fields. Product names should be descriptive and unique to avoid confusion in your inventory.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        opacity: .65;
+        transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        // Enhanced form validation display
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const validationSummary = document.querySelector('[asp-validation-summary]');
+            
+            if (validationSummary && validationSummary.children.length > 0) {
+                validationSummary.classList.remove('d-none');
+            }
+            
+            // Add real-time validation feedback
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('is-valid');
+                        this.classList.remove('is-invalid');
+                    }
+                });
+                
+                input.addEventListener('invalid', function() {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                });
+            });
+        });
+    </script>
+}
+@*
 @{
     ViewData["Title"] = "Create";
 }
@@ -45,3 +238,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+*@
