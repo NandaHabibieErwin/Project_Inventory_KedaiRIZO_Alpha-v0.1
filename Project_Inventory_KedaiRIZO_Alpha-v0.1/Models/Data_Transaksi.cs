@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Models
 {
@@ -21,7 +22,7 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Models
         public DateTime Tanggal { get; set; }
         public int TotalAmount { get; set; }
 
-
+        [Required]
         public virtual ICollection<Detail_Transaksi> Details { get; set; } = new List<Detail_Transaksi>();
     }
 }

@@ -34,9 +34,9 @@
                             <li><a class="dropdown-item" asp-area="" asp-controller="Products" asp-action="Index">
                                 <i class="bi bi-boxes me-2"></i>Produk
                             </a></li>
-                            <li><a class="dropdown-item" asp-area="" asp-controller="Kategoris" asp-action="Index">
+                         <!--   <li><a class="dropdown-item" asp-area="" asp-controller="Kategoris" asp-action="Index">
                                 <i class="bi bi-tags me-2"></i>Kategori
-                            </a></li>
+                               </a></li> -->
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -47,9 +47,9 @@
                             <li><a class="dropdown-item" asp-area="" asp-controller="Data_Transaksi" asp-action="Index">
                                 <i class="bi bi-list-ul me-2"></i>Data Transaksi
                             </a></li>
-                            <li><a class="dropdown-item" asp-area="" asp-controller="Detail_Transaksi" asp-action="Index">
+                          <!--  <li><a class="dropdown-item" asp-area="" asp-controller="Detail_Transaksi" asp-action="Index">
                                 <i class="bi bi-file-earmark-text me-2"></i>Detail Transaksi
-                            </a></li>
+                              </a></li> -->
                         </ul>
                     </li>
                 </ul>
@@ -68,10 +68,11 @@
             <!-- Sidebar -->
             <nav class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse shadow-sm d-none d-md-block" style="min-height: calc(100vh - 76px);">
                 <div class="position-sticky pt-3">
-                    <div class="px-3 mb-3">
-                        <h6 class="text-muted text-uppercase fw-bold small">Menu Utama</h6>
-                    </div>
+
                     
+                    <div class="px-3 mb-3">
+                        <h6 class="text-muted text-uppercase fw-bold small">Dashboard</h6>
+                    </div>
                     <ul class="nav flex-column">
                         <li class="nav-item mb-1">
                             <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
@@ -79,6 +80,19 @@
                             </a>
                         </li>
                     </ul>
+
+                    <div class="px-3 mb-2 mt-4">
+                        <h6 class="text-muted text-uppercase fw-bold small">Transaksi</h6>
+                    </div>
+
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Data_Transaksi" asp-action="Index">
+                                <i class="bi bi-receipt me-3 text-warning"></i>Data Transaksi
+                            </a>
+                        </li>
+                    </ul>
+                    <hr class="my-4">
 
                     <div class="px-3 mb-2 mt-4">
                         <h6 class="text-muted text-uppercase fw-bold small">Inventory</h6>
@@ -95,24 +109,7 @@
                                 <i class="bi bi-tags me-3 text-info"></i>Kategori
                             </a>
                         </li>
-                    </ul>
-
-                    <div class="px-3 mb-2 mt-4">
-                        <h6 class="text-muted text-uppercase fw-bold small">Transaksi</h6>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item mb-1">
-                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Data_Transaksi" asp-action="Index">
-                                <i class="bi bi-receipt me-3 text-warning"></i>Data Transaksi
-                            </a>
-                        </li>
-                        <li class="nav-item mb-1">
-                            <a class="nav-link text-dark px-3 py-2 rounded-3 d-flex align-items-center" asp-area="" asp-controller="Detail_Transaksi" asp-action="Index">
-                                <i class="bi bi-file-earmark-text me-3 text-danger"></i>Detail Transaksi
-                            </a>
-                        </li>
-                    </ul>
+                    </ul>                    
 
                     <hr class="my-4">
                     
@@ -186,8 +183,8 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<!--    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"> </script> -->
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 

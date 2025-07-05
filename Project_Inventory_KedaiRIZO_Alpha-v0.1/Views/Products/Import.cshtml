@@ -1,0 +1,363 @@
+﻿@{
+    ViewData["Title"] = "Import Products";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <!-- Header Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-file-import text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h2 class="card-title mb-2 fw-bold text-success">Import Products</h2>
+                    <p class="text-muted mb-0">Upload CSV or Excel files to bulk import products into your inventory</p>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Import Form Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-success text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-upload me-2"></i>Upload File
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Import" method="post" enctype="multipart/form-data">
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <div class="upload-area" id="uploadArea">
+                                    <div class="upload-content text-center">
+                                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                        <h5 class="upload-title">Drag & Drop your file here</h5>
+                                        <p class="upload-subtitle">or click to browse</p>
+                                        <input type="file" name="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls" required>
+                                        <div class="file-info" id="fileInfo" style="display: none;">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            <span class="file-name"></span>
+                                            <span class="file-size badge bg-secondary ms-2"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <!--    <div class="col-12">
+                                <div class="supported-formats">
+                                    <h6 class="fw-semibold mb-2">Supported Formats:</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="format-item">
+                                                <i class="fas fa-file-csv text-success me-2"></i>
+                                                <span>CSV (.csv)</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="format-item">
+                                                <i class="fas fa-file-excel text-success me-2"></i>
+                                                <span>Excel (.xlsx, .xls)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div> -->
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg me-md-2 px-4">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-lg px-5" id="importBtn" disabled>
+                                        <i class="fas fa-file-import me-2"></i>Import Products
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- File Format Instructions -->
+            <div class="card border-0 mt-4 bg-light">
+                <div class="card-header bg-transparent border-0">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-info-circle text-info me-2"></i>File Format Requirements
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-semibold">Required Columns:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Product_Name</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Price</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Stock</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Category</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-semibold">Available Categories:</h6>
+                            <div class="category-list">
+                                @if (ViewData["KategoriOptions"] is IEnumerable<object> kategoriOptions)
+                                {
+                                    foreach (var category in kategoriOptions)
+                                    {
+                                        dynamic item = category;
+                                        <span class="badge bg-primary me-1 mb-1">@item.Nama_Kategori</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="text-muted">No categories available.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="sample-format p-3 bg-white border rounded">
+                                <h6 class="fw-semibold mb-2">Sample Format:</h6>
+                                <code class="text-dark">
+                                    Product_Name,Price,Stock,Category<br>
+                                    "Sample Product 1",15000,50,"Electronics"<br>
+                                    "Sample Product 2",25000,30,"Books"
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="card border-0 mt-4 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-export me-2"></i>Export Current Data
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-3">Export your current product data to use as a template or for backup purposes.</p>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a asp-action="ExportCsv" class="btn btn-outline-success btn-lg me-md-2 px-4">
+                            <i class="fas fa-file-csv me-2"></i>Export as CSV
+                        </a>
+                      <!-- <a asp-action="ExportExcel" class="btn btn-outline-success btn-lg px-4">
+                            <i class="fas fa-file-excel me-2"></i>Export as Excel
+                        </a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .upload-area {
+        border: 2px dashed #28a745;
+        border-radius: 12px;
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        position: relative;
+    }
+
+    .upload-area:hover {
+        border-color: #20c997;
+        background: #e9ecef;
+    }
+
+    .upload-area.dragover {
+        border-color: #20c997;
+        background: #d1ecf1;
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+
+    .upload-title {
+        font-size: 1.25rem;
+        color: #28a745;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-subtitle {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-info {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .format-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+    }
+
+    .supported-formats {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .category-list {
+        max-height: 100px;
+        overflow-y: auto;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-outline-success:hover {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-color: #28a745;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+<!-- JavaScript for file handling -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const importBtn = document.getElementById('importBtn');
+
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                displayFileInfo(file);
+                importBtn.disabled = false;
+            } else {
+                hideFileInfo();
+                importBtn.disabled = true;
+            }
+        });
+
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (isValidFileType(file)) {
+                    fileInput.files = files;
+                    displayFileInfo(file);
+                    importBtn.disabled = false;
+                } else {
+                    alert('Please select a CSV or Excel file.');
+                }
+            }
+        });
+
+        function displayFileInfo(file) {
+            const fileName = file.name;
+            const fileSize = formatFileSize(file.size);
+
+            fileInfo.querySelector('.file-name').textContent = fileName;
+            fileInfo.querySelector('.file-size').textContent = fileSize;
+            fileInfo.style.display = 'block';
+        }
+
+        function hideFileInfo() {
+            fileInfo.style.display = 'none';
+        }
+
+        function isValidFileType(file) {
+            const validTypes = ['.csv', '.xlsx', '.xls'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            return validTypes.includes(fileExtension);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    });
+</script>
+
+<!-- FontAwesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

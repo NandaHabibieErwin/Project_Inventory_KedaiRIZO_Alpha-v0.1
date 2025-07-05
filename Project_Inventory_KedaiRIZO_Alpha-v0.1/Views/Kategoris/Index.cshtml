@@ -1,4 +1,349 @@
 ﻿@model IEnumerable<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori>
+@{
+    ViewData["Title"] = "Category Management";
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-tags text-primary me-2"></i>Category Management
+        </h2>
+        <p class="text-muted mb-0">Manage your product categories</p>
+    </div>
+    <div class="col-md-6">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+            <a asp-action="Create" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-lg me-2"></i>Add Category
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-1">Total Categories</h6>
+                        <h3 class="mb-0">@Model.Count()</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-tags fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-1">Most Recent</h6>
+                        <h3 class="mb-0">@(Model.Any() ? Model.OrderByDescending(c => c.Id).First().Nama_Kategori : "None")</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-clock fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search categories...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="sortFilter">
+                    <option value="">Sort by</option>
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                    <option value="id-asc">ID (Low to High)</option>
+                    <option value="id-desc">ID (High to Low)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                    <i class="bi bi-x-lg me-1"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Table -->
+@if (Model.Any())
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="categoriesTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="py-3">
+                                <i class="bi bi-hash me-1"></i>ID
+                            </th>
+                            <th class="py-3">
+                                <i class="bi bi-tag me-1"></i>Category Name
+                            </th>
+                            <th class="py-3 text-center">
+                                <i class="bi bi-gear me-1"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="py-3">
+                                    <span class="badge bg-secondary fs-6">#@item.Id</span>
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-tag text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-semibold">@Html.DisplayFor(modelItem => item.Nama_Kategori)</h6>
+                                            <small class="text-muted">Category ID: @item.Id</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-info btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#viewDetailsModal"
+                                                onclick="viewDetails('@item.Id', '@item.Nama_Kategori')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"
+                                                onclick="deleteCategory('@item.Id', '@item.Nama_Kategori')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-tags text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="text-muted mb-2">No Categories Found</h4>
+            <p class="text-muted mb-4">Start by adding your first product category</p>
+            <a asp-action="Create" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-lg me-2"></i>Add First Category
+            </a>
+        </div>
+    </div>
+}
+
+<!-- View Details Modal -->
+<div class="modal fade" id="viewDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>Category Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-tag text-white fs-2"></i>
+                                </div>
+                                <h4 id="detailCategoryName" class="fw-bold">Category Name</h4>
+                                <p class="text-muted mb-0">Category ID: <span id="detailCategoryId"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3">Category Information</h6>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">Category ID</small>
+                                        <p class="fw-semibold mb-2">#<span id="detailId"></span></p>
+                                    </div>
+                                    <div class="col-12">
+                                        <small class="text-muted">Category Name</small>
+                                        <p class="fw-semibold mb-2"><span id="detailName"></span></p>
+                                    </div>
+                                    <div class="col-12">
+                                        <small class="text-muted">Status</small>
+                                        <p class="fw-semibold mb-0">
+                                            <span class="badge bg-success">Active</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Category Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="bi bi-trash text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h5>Are you sure you want to delete this category?</h5>
+                <p class="text-muted mb-0">
+                    Category: <strong id="deleteCategoryName"></strong><br>
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x me-1"></i>Cancel
+                </button>
+                <form asp-action="Delete" method="post" style="display: inline;">
+                    <input type="hidden" id="deleteId" name="id">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Delete Category
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search and Filter Functions
+    document.getElementById('searchInput').addEventListener('input', filterTable);
+    document.getElementById('sortFilter').addEventListener('change', sortTable);
+
+    function filterTable() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const table = document.getElementById('categoriesTable');
+        if (!table) return;
+
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const categoryName = row.cells[1].textContent.toLowerCase();
+            const categoryId = row.cells[0].textContent.toLowerCase();
+
+            let showRow = true;
+
+            // Search filter
+            if (searchTerm && !categoryName.includes(searchTerm) && !categoryId.includes(searchTerm)) {
+                showRow = false;
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        }
+    }
+
+    function sortTable() {
+        const sortValue = document.getElementById('sortFilter').value;
+        const table = document.getElementById('categoriesTable');
+        if (!table) return;
+
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        rows.sort((a, b) => {
+            let aValue, bValue;
+
+            switch (sortValue) {
+                case 'name-asc':
+                    aValue = a.cells[1].textContent.toLowerCase();
+                    bValue = b.cells[1].textContent.toLowerCase();
+                    return aValue.localeCompare(bValue);
+                case 'name-desc':
+                    aValue = a.cells[1].textContent.toLowerCase();
+                    bValue = b.cells[1].textContent.toLowerCase();
+                    return bValue.localeCompare(aValue);
+                case 'id-asc':
+                    aValue = parseInt(a.cells[0].textContent.match(/\d+/)[0]);
+                    bValue = parseInt(b.cells[0].textContent.match(/\d+/)[0]);
+                    return aValue - bValue;
+                case 'id-desc':
+                    aValue = parseInt(a.cells[0].textContent.match(/\d+/)[0]);
+                    bValue = parseInt(b.cells[0].textContent.match(/\d+/)[0]);
+                    return bValue - aValue;
+                default:
+                    return 0;
+            }
+        });
+
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function clearFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('sortFilter').value = '';
+        filterTable();
+    }
+
+    // Modal Functions
+    function viewDetails(id, name) {
+        document.getElementById('detailCategoryId').textContent = id;
+        document.getElementById('detailCategoryName').textContent = name;
+        document.getElementById('detailId').textContent = id;
+        document.getElementById('detailName').textContent = name;
+    }
+
+    function deleteCategory(id, name) {
+        document.getElementById('deleteId').value = id;
+        document.getElementById('deleteCategoryName').textContent = name;
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+@*
+@model IEnumerable<Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori>
 
 @{
     ViewData["Title"] = "Index";
@@ -33,3 +378,4 @@
 }
     </tbody>
 </table>
+*@

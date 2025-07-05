@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+
 
 namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Models
 {

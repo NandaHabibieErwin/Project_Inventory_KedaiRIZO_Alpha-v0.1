@@ -1,25 +1,31 @@
 ﻿@{
-    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
-    {
-        Layout = parentLayout.ToString();
-    }
-    else
-    {
-        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
-    }
+    Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Manage your account</h1>
-
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
+<div class="container-fluid py-4">
     <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
-        </div>
-        <div class="col-md-9">
-            @RenderBody()
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0 h4">
+                        <i class="fas fa-user-cog me-2"></i>Account Settings
+                    </h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-lg-3 col-md-4 bg-light border-end">
+                            <div class="p-3">
+                                <partial name="_ManageNav" />
+                            </div>
+                        </div>
+                        <div class="col-lg-9 col-md-8">
+                            <div class="p-4">
+                                @RenderBody()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

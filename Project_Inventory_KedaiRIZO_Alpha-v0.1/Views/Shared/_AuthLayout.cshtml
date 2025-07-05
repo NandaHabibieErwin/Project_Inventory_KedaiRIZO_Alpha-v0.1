@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    </environment>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <main class="flex-fill d-flex align-items-center justify-content-center py-5">
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,8 +1,352 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers.DashboardViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@{
+    ViewData["Title"] = "Dashboard - KedaiRIZO";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/dashboard.css" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="fas fa-tachometer-alt"></i> Dashboard Kedai RIZO                
+            </h2>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-8">
+                            <h4>@Model.TotalProducts</h4>
+                            <p class="mb-0">Total Produk</p>
+                        </div>
+                        <div class="col-4 text-right">
+                            <i class="fas fa-boxes fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-8">
+                            <h4>@Model.TotalCategories</h4>
+                            <p class="mb-0">Total Kategori</p>
+                        </div>
+                        <div class="col-4 text-right">
+                            <i class="fas fa-tags fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-8">
+                            <h4>@Model.TotalTransactions</h4>
+                            <p class="mb-0">Total Transaksi</p>
+                        </div>
+                        <div class="col-4 text-right">
+                            <i class="fas fa-receipt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-8">
+                            <h4>Rp @Model.TotalRevenue.ToString("N0")</h4>
+                            <p class="mb-0">Total Pendapatan</p>
+                        </div>
+                        <div class="col-4 text-right">
+                            <i class="fas fa-money-bill-wave fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Tables Row -->
+    <div class="row">
+        <!-- Product by Category Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Produk per Kategori</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Sales Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> Penjualan Bulanan</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Row -->
+    <div class="row mt-4">
+        <!-- Low Stock Alert -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Stok Rendah (< 10)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.LowStockProducts.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Kategori</th>
+                                        <th>Stok</th>
+                                        <th>Harga</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.LowStockProducts)
+                                    {
+                                        <tr>
+                                            <td>@product.Product_Name</td>
+                                            <td>@product.Kategori?.Nama_Kategori</td>
+                                            <td>
+                                                <span class="badge badge-danger">@product.stock</span>
+                                            </td>
+                                            <td>Rp @product.harga.ToString("N0")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Semua produk memiliki stok yang cukup!
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Transaksi Terbaru</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentTransactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>User</th>
+                                        <th>Total</th>
+                                        <th>Items</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model.RecentTransactions)
+                                    {
+                                        <tr>
+                                            <td>@transaction.Tanggal.ToString("dd/MM/yyyy")</td>
+                                            <td>@transaction.ApplicationUser?.UserName</td>
+                                            <td>Rp @transaction.TotalAmount.ToString("N0")</td>
+                                            <td>@transaction.Details.Count items</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Belum ada transaksi.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Products -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-star"></i> Produk Terlaris</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TopSellingProducts.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Produk</th>
+                                        <th>Kategori</th>
+                                        <th>Total Terjual</th>
+                                        <th>Stok Tersisa</th>
+                                        <th>Harga</th>
+                                        <th>Total Pendapatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int rank = 1;
+                                    }
+                                    @foreach (var product in Model.TopSellingProducts)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (rank == 1)
+                                                {
+                                                    <i class="fas fa-trophy text-warning"></i>
+                                                }
+                                                else if (rank == 2)
+                                                {
+                                                    <i class="fas fa-medal text-secondary"></i>
+                                                }
+                                                else if (rank == 3)
+                                                {
+                                                    <i class="fas fa-medal text-warning"></i>
+                                                }
+                                                else
+                                                {
+                                                    <span>@rank</span>
+                                                }
+                                            </td>
+                                            <td>@product.Product_Name</td>
+                                            <td>@product.Kategori?.Nama_Kategori</td>
+                                            <td>@product.TotalSold</td>
+                                            <td>@product.stock</td>
+                                            <td>Rp @product.harga.ToString("N0")</td>
+                                            <td>Rp @((product.TotalSold * product.harga).ToString("N0"))</td>
+                                        </tr>
+                                        rank++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Belum ada data penjualan.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Category Chart
+        const categoryData = @Html.Raw(Json.Serialize(Model.CategoryData));
+        const categoryLabels = categoryData.map(item => item.categoryName);
+        const categoryValues = categoryData.map(item => item.productCount);
+
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Sales Chart
+        const salesData = @Html.Raw(Json.Serialize(Model.MonthlySalesData));
+        const salesLabels = salesData.map(item => item.month);
+        const salesValues = salesData.map(item => item.totalSales);
+
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: 'Penjualan (Rp)',
+                    data: salesValues,
+                    borderColor: '#36A2EB',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+}
+}

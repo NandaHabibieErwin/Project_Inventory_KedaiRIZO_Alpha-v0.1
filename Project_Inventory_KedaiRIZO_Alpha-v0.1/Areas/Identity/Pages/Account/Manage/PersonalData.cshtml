@@ -5,23 +5,243 @@
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
-<h3>@ViewData["Title"]</h3>
+<div class="manage-page-container">
+    <div class="page-header">
+        <div class="d-flex align-items-center mb-3">
+            <div class="icon-container me-3">
+                <i class="bi bi-shield-lock text-primary"></i>
+            </div>
+            <div>
+                <h2 class="mb-1 fw-bold">@ViewData["Title"]</h2>
+                <p class="text-muted mb-0">Download or delete your personal information</p>
+            </div>
+        </div>
+    </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
-        <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
-        </p>
-        <form id="download-data" asp-page="DownloadPersonalData" method="post">
-            <button class="btn btn-primary" type="submit">Download</button>
-        </form>
-        <p>
-            <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger">Delete</a>
-        </p>
+    <div class="row g-4">
+        <!-- Data Download Card -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="feature-icon bg-primary bg-opacity-10 text-primary me-3">
+                            <i class="bi bi-download"></i>
+                        </div>
+                        <h5 class="mb-0 fw-bold">Download Your Data</h5>
+                    </div>
+
+                    <p class="text-muted mb-4">
+                        Export all your personal data that we have stored. This includes your profile information,
+                        preferences, and activity history in a portable format.
+                    </p>
+
+                    <div class="data-info mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <span class="small">Profile information</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <span class="small">Account settings</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <span class="small">Activity logs</span>
+                        </div>
+                    </div>
+
+                    <form id="download-data" asp-page="DownloadPersonalData" method="post">
+                        <button class="btn btn-primary w-100" type="submit">
+                            <i class="bi bi-cloud-download me-2"></i>Download My Data
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Deletion Card -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100 border-danger border-opacity-25">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="feature-icon bg-danger bg-opacity-10 text-danger me-3">
+                            <i class="bi bi-trash"></i>
+                        </div>
+                        <h5 class="mb-0 fw-bold text-danger">Delete Account</h5>
+                    </div>
+
+                    <div class="alert alert-warning border-0 mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-2 mt-1"></i>
+                            <div>
+                                <strong>Warning:</strong> This action is permanent and cannot be undone.
+                                All your data will be permanently removed from our systems.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="deletion-info mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-x-circle text-danger me-2"></i>
+                            <span class="small">All personal information</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-x-circle text-danger me-2"></i>
+                            <span class="small">Account access</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-x-circle text-danger me-2"></i>
+                            <span class="small">All associated data</span>
+                        </div>
+                    </div>
+
+                    <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger w-100">
+                        <i class="bi bi-trash me-2"></i>Delete My Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-info-circle text-info me-2"></i>
+                <h6 class="mb-0 fw-bold">Data Privacy Information</h6>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <h6 class="fw-semibold mb-2">What data do we collect?</h6>
+                    <p class="text-muted small mb-0">
+                        We collect information you provide directly, such as your account details,
+                        preferences, and any content you create or share through our services.
+                    </p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h6 class="fw-semibold mb-2">How is your data protected?</h6>
+                    <p class="text-muted small mb-0">
+                        Your data is encrypted and stored securely. We follow industry best practices
+                        and comply with privacy regulations to protect your information.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<style>
+    .manage-page-container {
+        max-width: 900px;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .icon-container {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-container i {
+        font-size: 1.5rem;
+    }
+
+    .feature-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .data-info, .deletion-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .small {
+        font-size: 0.875rem;
+    }
+
+    @@media (max-width: 768px) {
+        .icon-container {
+            width: 50px;
+            height: 50px;
+        }
+
+        .icon-container i {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .feature-icon {
+            width: 35px;
+            height: 35px;
+            font-size: 1rem;
+        }
+    }
+</style>

@@ -1,15 +1,131 @@
 ﻿@inject SignInManager<IdentityUser> SignInManager
 @{
-    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();    
 }
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
-    @if (hasExternalLogins)
-    {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+
+<div class="manage-nav-container">
+    <div class="manage-nav-header">
+        <h5 class="mb-0 text-primary fw-bold">
+            <i class="bi bi-person-gear me-2"></i>Account Settings
+        </h5>
+        <p class="text-muted small mb-0">Manage your account preferences and security</p>
+    </div>
+    
+    <nav class="manage-nav">
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+                <a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">
+                    <i class="bi bi-envelope me-2"></i>
+                    <span>Email</span>
+                    <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">
+                    <i class="bi bi-key me-2"></i>
+                    <span>Password</span>
+                    <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </li>
+            @if (hasExternalLogins)
+            {
+                <li class="nav-item">
+                    <a class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" id="external-login" asp-page="./ExternalLogins">
+                        <i class="bi bi-link-45deg me-2"></i>
+                        <span>External Logins</span>
+                        <i class="bi bi-chevron-right ms-auto"></i>
+                    </a>
+                </li>
+            }
+            <li class="nav-item">
+                <a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">
+                    <i class="bi bi-shield-lock me-2"></i>
+                    <span>Personal Data</span>
+                    <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<style>
+    .manage-nav-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.06);
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
-</ul>
+    
+    .manage-nav-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .manage-nav {
+        padding: 1rem;
+    }
+    
+    .manage-nav .nav-pills .nav-link {
+        border-radius: 8px;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 0.875rem 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        text-decoration: none;
+    }
+    
+    .manage-nav .nav-pills .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #495057;
+        border-color: rgba(0,0,0,0.08);
+        transform: translateX(4px);
+    }
+    
+    .manage-nav .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        color: white;
+        border-color: #0d6efd;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+    }
+    
+    .manage-nav .nav-pills .nav-link.active:hover {
+        transform: translateX(0);
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+    }
+    
+    .manage-nav .nav-pills .nav-link i.bi-chevron-right {
+        font-size: 0.875rem;
+        opacity: 0.6;
+        transition: all 0.2s ease;
+    }
+    
+    .manage-nav .nav-pills .nav-link:hover i.bi-chevron-right {
+        opacity: 1;
+        transform: translateX(2px);
+    }
+    
+    .manage-nav .nav-pills .nav-link.active i.bi-chevron-right {
+        opacity: 1;
+    }
+    
+    @@media (max-width: 768px) {
+        .manage-nav-container {
+            margin-bottom: 1rem;
+        }
+        
+        .manage-nav-header {
+            padding: 1rem;
+        }
+        
+        .manage-nav .nav-pills .nav-link {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>

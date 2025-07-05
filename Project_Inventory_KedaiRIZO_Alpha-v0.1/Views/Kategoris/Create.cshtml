@@ -1,4 +1,125 @@
 ﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-plus-circle text-success me-2"></i>Create New Category
+        </h2>
+        <p class="text-muted mb-0">Add a new product category to your inventory</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Categories
+        </a>
+    </div>
+</div>
+
+<!-- Create Form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-tag me-2"></i>Category Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" id="createForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="Nama_Kategori" class="form-label fw-bold">
+                            <i class="bi bi-tag me-2"></i>Category Name
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-tag text-muted"></i>
+                            </span>
+                            <input asp-for="Nama_Kategori" class="form-control form-control-lg"
+                                   placeholder="Enter category name..."
+                                   autocomplete="off" />
+                        </div>
+                        <span asp-validation-for="Nama_Kategori" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-lg me-md-2">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-lg me-2"></i>Create Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Card -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h6 class="card-title text-muted">
+                    <i class="bi bi-lightbulb me-2"></i>Tips for Creating Categories
+                </h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0 small text-muted">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Use descriptive and clear names</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Keep names concise but meaningful</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Avoid special characters</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0 small text-muted">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Make sure the name is unique</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Consider future product organization</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Use consistent naming conventions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Auto focus on input when page loads
+        $(document).ready(function () {
+            $('#Nama_Kategori').focus();
+        });
+
+        // Form validation enhancement
+        $('#createForm').on('submit', function (e) {
+            var namaKategori = $('#Nama_Kategori').val().trim();
+
+            if (namaKategori === '') {
+                e.preventDefault();
+                $('#Nama_Kategori').addClass('is-invalid');
+                return false;
+            }
+
+            // Show loading state
+            var submitBtn = $(this).find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+            submitBtn.html('<i class="bi bi-hourglass-split me-2"></i>Creating...');
+        });
+
+        // Remove invalid class when user starts typing
+        $('#Nama_Kategori').on('input', function () {
+            $(this).removeClass('is-invalid');
+        });
+    </script>
+}
+@*
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori
 
 @{
     ViewData["Title"] = "Create";
@@ -31,3 +152,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+*@

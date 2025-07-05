@@ -5,100 +5,88 @@
 }
 
 <div class="container">
-    <h2>@ViewData["Title"]</h2>
-
     <form asp-action="Create" id="transactionForm">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
+        <input type="hidden" asp-for="UserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Informasi Transaksi</h5>
-            </div>
-            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-0">Transaksi Baru</h5>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">
-                            <label asp-for="UserId" class="form-label">User</label>
-                            <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId">
-                                <option value="">-- Pilih User --</option>
-                            </select>
-                            <span asp-validation-for="UserId" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label asp-for="Tanggal" class="form-label">Tanggal</label>
                             <input asp-for="Tanggal" class="form-control" type="datetime-local" />
                             <span asp-validation-for="Tanggal" class="text-danger"></span>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-sm btn-success" onclick="addNewRow()">
+                            <i class="fas fa-plus"></i> Tambah Barang
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Detail Produk</h5>
-                <button type="button" class="btn btn-sm btn-success" onclick="addNewRow()">
-                    <i class="fas fa-plus"></i> Tambah Baris
-                </button>
-            </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="productTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 40%;">Produk</th>
-                                <th style="width: 15%;">Quantity</th>
-                                <th style="width: 20%;">Harga Satuan</th>
-                                <th style="width: 20%;">Total</th>
-                                <th style="width: 5%;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody">
-                            @for (int i = 0; i < Model.Items.Count; i++)
-                            {
-                                <tr class="product-row">
-                                    <td>
-                                        <select asp-for="Items[i].ProductId" class="form-select product-select" onchange="updatePrice(this, @i)">
-                                            <option value="">-- Pilih Produk --</option>
-                                            @foreach (var product in ViewBag.Products as SelectList)
-                                            {
-                                                <option value="@product.Value">@product.Text</option>
-                                            }
-                                        </select>
-                                        <input type="hidden" asp-for="Items[i].ProductId" />
-                                        <span asp-validation-for="Items[@i].ProductId" class="text-danger small"></span>
-                                    </td>
-                                    <td>
-                                        <input asp-for="Items[i].Quantity" class="form-control quantity-input" type="number" min="0" onchange="calculateTotal(@i)" />
-                                        <div class="stock-info text-muted small"></div>
-                                        <span asp-validation-for="Items[@i].Quantity" class="text-danger small"></span>
-                                    </td>
-                                    <td>
-                                        <span class="price-display">Rp 0</span>
-                                        <input type="hidden" class="unit-price" value="0" />
-                                    </td>
-                                    <td>
-                                        <span class="total-display font-weight-bold">Rp 0</span>
-                                        <input type="hidden" class="item-total" value="0" />
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)" title="Hapus Baris">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="productTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 40%;">Produk</th>
+                                    <th style="width: 15%;">Quantity</th>
+                                    <th style="width: 20%;">Harga Satuan</th>
+                                    <th style="width: 20%;">Total</th>
+                                    <th style="width: 5%;">Action</th>
                                 </tr>
-                            }
-                        </tbody>
-                        <tfoot>
-                            <tr class="table-info">
-                                <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
-                                <td><strong id="grandTotal">Rp 0</strong></td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </thead>
+                            <tbody id="productTableBody">
+                                @for (int i = 0; i < Model.Items.Count; i++)
+                                {
+                                    <tr class="product-row" data-row-index="@i">
+                                        <td>
+                                            <select asp-for="Items[i].ProductId" class="form-select product-select" onchange="updatePrice(this)">
+                                                <option value="">-- Pilih Produk --</option>
+                                                @foreach (var product in ViewBag.Products as SelectList)
+                                                {
+                                                    <option value="@product.Value">@product.Text</option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="Items[@i].ProductId" class="text-danger small"></span>
+                                        </td>
+                                        <td>
+                                            <input asp-for="Items[i].Quantity" class="form-control quantity-input" type="number" min="0" onchange="calculateTotal(this)" />
+                                            <div class="stock-info text-muted small"></div>
+                                            <span asp-validation-for="Items[@i].Quantity" class="text-danger small"></span>
+                                        </td>
+                                        <td>
+                                            <span class="price-display">Rp 0</span>
+                                            <input type="hidden" class="unit-price" value="0" />
+                                        </td>
+                                        <td>
+                                            <span class="total-display font-weight-bold">Rp 0</span>
+                                            <input type="hidden" class="item-total" value="0" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)" title="Hapus Baris">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-info">
+                                    <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+                                    <td><strong id="grandTotal">Rp 0</strong></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,7 +111,7 @@
     <script>
         let rowIndex = @Model.Items.Count;
 
-        async function updatePrice(selectElement, index) {
+        async function updatePrice(selectElement) {
             const productId = selectElement.value;
             const row = selectElement.closest('tr');
             const priceDisplay = row.querySelector('.price-display');
@@ -141,22 +129,26 @@
                     stockInfo.textContent = `Stock: ${data.stock}`;
                     quantityInput.max = data.stock;
 
-                    calculateTotal(index);
+                    // Recalculate total for this row
+                    calculateTotal(quantityInput);
                 } catch (error) {
                     console.error('Error fetching product price:', error);
+                    priceDisplay.textContent = 'Rp 0';
+                    unitPriceInput.value = 0;
+                    stockInfo.textContent = '';
+                    quantityInput.max = '';
                 }
             } else {
                 priceDisplay.textContent = 'Rp 0';
                 unitPriceInput.value = 0;
                 stockInfo.textContent = '';
                 quantityInput.max = '';
-                calculateTotal(index);
+                calculateTotal(quantityInput);
             }
         }
 
-        function calculateTotal(index) {
-            const rows = document.querySelectorAll('.product-row');
-            const row = rows[index];
+        function calculateTotal(inputElement) {
+            const row = inputElement.closest('tr');
             const quantity = parseInt(row.querySelector('.quantity-input').value) || 0;
             const unitPrice = parseInt(row.querySelector('.unit-price').value) || 0;
             const total = quantity * unitPrice;
@@ -179,57 +171,155 @@
             const tbody = document.getElementById('productTableBody');
             const newRow = document.createElement('tr');
             newRow.className = 'product-row';
+            newRow.setAttribute('data-row-index', rowIndex);
+
             newRow.innerHTML = `
-                <td>
-                    <select name="Items[${rowIndex}].ProductId" class="form-select product-select" onchange="updatePrice(this, ${rowIndex})">
-                        <option value="">-- Pilih Produk --</option>
+                        <td>
+                            <select name="Items[${rowIndex}].ProductId" class="form-select product-select" onchange="updatePrice(this)">
+                                <option value="">-- Pilih Produk --</option>
         @foreach (var product in ViewBag.Products as SelectList)
         {
-                                <option value="@product.Value">@product.Text</option>
+                                        <option value="@product.Value">@product.Text</option>
         }
-                    </select>
-                </td>
-                <td>
-                    <input name="Items[${rowIndex}].Quantity" class="form-control quantity-input" type="number" min="0" onchange="calculateTotal(${rowIndex})" />
-                    <div class="stock-info text-muted small"></div>
-                </td>
-                <td>
-                    <span class="price-display">Rp 0</span>
-                    <input type="hidden" class="unit-price" value="0" />
-                </td>
-                <td>
-                    <span class="total-display font-weight-bold">Rp 0</span>
-                    <input type="hidden" class="item-total" value="0" />
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)" title="Hapus Baris">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
+                            </select>
+                        </td>
+                        <td>
+                            <input name="Items[${rowIndex}].Quantity" class="form-control quantity-input" type="number" min="0" onchange="calculateTotal(this)" />
+                            <div class="stock-info text-muted small"></div>
+                        </td>
+                        <td>
+                            <span class="price-display">Rp 0</span>
+                            <input type="hidden" class="unit-price" value="0" />
+                        </td>
+                        <td>
+                            <span class="total-display font-weight-bold">Rp 0</span>
+                            <input type="hidden" class="item-total" value="0" />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)" title="Hapus Baris">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+
             tbody.appendChild(newRow);
             rowIndex++;
-            $.validator.unobtrusive.parse('#transactionForm');
+
+            // Re-index all rows to maintain proper form binding
+            reindexRows();
+
+            // Re-parse validation for new elements
+            if (typeof $.validator !== 'undefined') {
+                $.validator.unobtrusive.parse('#transactionForm');
+            }
         }
 
         function removeRow(button) {
             const row = button.closest('tr');
             row.remove();
+
+            // Re-index all rows to maintain proper form binding
+            reindexRows();
+
+            // Update grand total
             updateGrandTotal();
         }
 
-        // Initialize calculations on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const rows = document.querySelectorAll('.product-row');
+        function reindexRows() {
+            const rows = document.querySelectorAll('#productTableBody .product-row');
             rows.forEach((row, index) => {
-                const selectElement = row.querySelector('.product-select');
-                if (selectElement.value) {
-                    updatePrice(selectElement, index);
+                // Update data attribute
+                row.setAttribute('data-row-index', index);
+
+                // Update form field names
+                const select = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+
+                if (select) {
+                    select.name = `Items[${index}].ProductId`;
+                }
+                if (quantityInput) {
+                    quantityInput.name = `Items[${index}].Quantity`;
                 }
             });
+
+            // Update rowIndex to be the next available index
+            rowIndex = rows.length;
+        }
+
+        // Initialize calculations on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('.product-row');
+            rows.forEach((row) => {
+                const selectElement = row.querySelector('.product-select');
+                if (selectElement && selectElement.value) {
+                    updatePrice(selectElement);
+                }
+            });
+
+            // Initial grand total calculation
+            updateGrandTotal();
+        });
+
+        // Form submission validation
+        document.getElementById('transactionForm').addEventListener('submit', function (e) {
+            const rows = document.querySelectorAll('.product-row');
+            let hasValidItems = false;
+
+            rows.forEach(row => {
+                const productSelect = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+
+                if (productSelect.value && quantityInput.value > 0) {
+                    hasValidItems = true;
+                }
+            });
+
+            if (!hasValidItems) {
+                e.preventDefault();
+                alert('Silakan tambahkan minimal satu produk dengan quantity yang valid.');
+                return false;
+            }
         });
     </script>
 }
+
+<style>
+    .product-row {
+        transition: background-color 0.2s;
+    }
+
+        .product-row:hover {
+            background-color: #f8f9fa;
+        }
+
+    .stock-info {
+        font-size: 0.8em;
+        margin-top: 2px;
+    }
+
+    .price-display, .total-display {
+        font-weight: 500;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-select, .form-control {
+        border-radius: 0.375rem;
+    }
+
+    .text-danger.small {
+        font-size: 0.8em;
+    }
+</style>
 @*
 @model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
 

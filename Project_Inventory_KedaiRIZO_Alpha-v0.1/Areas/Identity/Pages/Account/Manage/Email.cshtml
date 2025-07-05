@@ -5,40 +5,198 @@
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
-        <form id="email-form" method="post">
-            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-            @if (Model.IsEmailConfirmed)
-            {
-                <div class="form-floating mb-3 input-group">
-                    <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                        <div class="input-group-append">
-                            <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
-                        </div>
-                    <label asp-for="Email" class="form-label"></label>
-                </div>
-            }
-            else
-            {
-                <div class="form-floating mb-3">
-                    <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                    <label asp-for="Email" class="form-label"></label>
-                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
-                </div>
-            }
-            <div class="form-floating mb-3">
-                <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
-                <label asp-for="Input.NewEmail" class="form-label"></label>
-                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+<div class="manage-page-container">
+    <div class="page-header">
+        <div class="d-flex align-items-center mb-3">
+            <div class="icon-container me-3">
+                <i class="bi bi-envelope-check text-primary"></i>
             </div>
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Change email</button>
-        </form>
+            <div>
+                <h2 class="mb-1 fw-bold">@ViewData["Title"]</h2>
+                <p class="text-muted mb-0">Update your email address and verification status</p>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form id="email-form" method="post">
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark">Current Email Address</label>
+                    @if (Model.IsEmailConfirmed)
+                    {
+                        <div class="input-group">
+                            <span class="input-group-text bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </span>
+                            <input asp-for="Email" class="form-control" disabled />
+                            <span class="input-group-text bg-light text-success fw-bold">
+                                Verified
+                            </span>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Your email address has been verified and is ready to use.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="input-group">
+                            <span class="input-group-text bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </span>
+                            <input asp-for="Email" class="form-control" disabled />
+                            <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail"
+                                    class="btn btn-outline-primary">
+                                <i class="bi bi-send me-1"></i>Send Verification
+                            </button>
+                        </div>
+                        <div class="form-text text-warning">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Your email address needs verification. Click "Send Verification" to receive a confirmation email.
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Input.NewEmail" class="form-label fw-semibold text-dark">New Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input asp-for="Input.NewEmail" class="form-control" autocomplete="email"
+                               aria-required="true" placeholder="Enter your new email address" />
+                    </div>
+                    <span asp-validation-for="Input.NewEmail" class="text-danger small"></span>
+                    <div class="form-text">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Enter a new email address to update your account. You'll need to verify the new address.
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail"
+                            class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-repeat me-2"></i>Update Email Address
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<style>
+    .manage-page-container {
+        max-width: 600px;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .icon-container {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-container i {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .input-group-text {
+        border: 1px solid #dee2e6;
+        font-weight: 500;
+    }
+
+    .form-control {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    }
+
+    .form-control:disabled {
+        background-color: #f8f9fa;
+        opacity: 1;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-outline-primary {
+        border: 1px solid #0d6efd;
+        color: #0d6efd;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        transform: translateY(-1px);
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @@media (max-width: 768px) {
+        .icon-container {
+            width: 50px;
+            height: 50px;
+        }
+
+        .icon-container i {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+</style>

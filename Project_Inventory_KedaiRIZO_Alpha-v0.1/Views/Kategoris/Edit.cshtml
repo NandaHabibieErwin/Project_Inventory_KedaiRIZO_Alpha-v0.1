@@ -1,4 +1,169 @@
 ﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-pencil-square text-warning me-2"></i>Edit Category
+        </h2>
+        <p class="text-muted mb-0">Update category information</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Categories
+        </a>
+    </div>
+</div>
+
+<!-- Edit Form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-tag me-2"></i>Category Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" id="editForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <!-- ID Display -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">
+                            <i class="bi bi-hash me-2"></i>Category ID
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-hash text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control" value="@Model.Id" readonly />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Nama_Kategori" class="form-label fw-bold">
+                            <i class="bi bi-tag me-2"></i>Category Name
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-tag text-muted"></i>
+                            </span>
+                            <input asp-for="Nama_Kategori" class="form-control form-control-lg"
+                                   placeholder="Enter category name..."
+                                   autocomplete="off" />
+                        </div>
+                        <span asp-validation-for="Nama_Kategori" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-lg me-md-2">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="button" class="btn btn-info btn-lg me-md-2" id="resetBtn">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </button>
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-lg me-2"></i>Update Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="card mt-4 border-warning">
+            <div class="card-body">
+                <h6 class="card-title text-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Important Notice
+                </h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0 small text-muted">
+                            <li><i class="bi bi-info-circle text-info me-2"></i>Changes will affect all related products</li>
+                            <li><i class="bi bi-info-circle text-info me-2"></i>Ensure the new name is still relevant</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0 small text-muted">
+                            <li><i class="bi bi-info-circle text-info me-2"></i>Check for duplicate category names</li>
+                            <li><i class="bi bi-info-circle text-info me-2"></i>Save changes to apply updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Store original value for reset functionality
+        var originalValue = $('#Nama_Kategori').val();
+
+        // Auto focus on input when page loads
+        $(document).ready(function () {
+            $('#Nama_Kategori').focus().select();
+        });
+
+        // Reset button functionality
+        $('#resetBtn').on('click', function () {
+            $('#Nama_Kategori').val(originalValue);
+            $('#Nama_Kategori').removeClass('is-invalid');
+            $(this).addClass('btn-outline-info').removeClass('btn-info');
+            setTimeout(function () {
+                $('#resetBtn').removeClass('btn-outline-info').addClass('btn-info');
+            }, 200);
+        });
+
+        // Form validation enhancement
+        $('#editForm').on('submit', function (e) {
+            var namaKategori = $('#Nama_Kategori').val().trim();
+
+            if (namaKategori === '') {
+                e.preventDefault();
+                $('#Nama_Kategori').addClass('is-invalid');
+                return false;
+            }
+
+            // Show loading state
+            var submitBtn = $(this).find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+            submitBtn.html('<i class="bi bi-hourglass-split me-2"></i>Updating...');
+        });
+
+        // Remove invalid class when user starts typing
+        $('#Nama_Kategori').on('input', function () {
+            $(this).removeClass('is-invalid');
+        });
+
+        // Detect changes for visual feedback
+        $('#Nama_Kategori').on('input', function () {
+            var currentValue = $(this).val();
+            var submitBtn = $('button[type="submit"]');
+
+            if (currentValue !== originalValue) {
+                submitBtn.removeClass('btn-warning').addClass('btn-success');
+                submitBtn.html('<i class="bi bi-check-lg me-2"></i>Save Changes');
+            } else {
+                submitBtn.removeClass('btn-success').addClass('btn-warning');
+                submitBtn.html('<i class="bi bi-check-lg me-2"></i>Update Category');
+            }
+        });
+    </script>
+}
+
+@*
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Kategori
 
 @{
     ViewData["Title"] = "Edit";
@@ -32,3 +197,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+*@

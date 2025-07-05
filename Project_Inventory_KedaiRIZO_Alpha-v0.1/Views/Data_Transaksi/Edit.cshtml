@@ -1,12 +1,363 @@
-﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
+﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers.TransactionViewModel
 
 @{
     ViewData["Title"] = "Edit Transaksi";
 }
 
 <div class="container">
-    <h2>@ViewData["Title"] #@Model.Id</h2>
+    <form asp-action="Edit" id="transactionForm">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="Id" />
 
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-0">Edit Transaksi #@Model.Id</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label asp-for="UserId" class="form-label">User</label>
+                            <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId">
+                                <option value="">-- Pilih User --</option>
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label asp-for="Tanggal" class="form-label">Tanggal</label>
+                            <input asp-for="Tanggal" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="Tanggal" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-success d-block" onclick="addNewRow()">
+                                <i class="fas fa-plus"></i> Tambah Barang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="productTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 40%;">Produk</th>
+                                <th style="width: 15%;">Quantity</th>
+                                <th style="width: 20%;">Harga Satuan</th>
+                                <th style="width: 20%;">Total</th>
+                                <th style="width: 5%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                <tr class="product-row" data-row-index="@i">
+                                    <td>
+                                        <select asp-for="Items[i].ProductId" class="form-select product-select" onchange="updatePrice(this)">
+                                            <option value="">-- Pilih Produk --</option>
+                                            @foreach (var product in ViewBag.Products as SelectList)
+                                            {
+                                                <option value="@product.Value" selected="@(product.Value == Model.Items[i].ProductId.ToString())">@product.Text</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="Items[@i].ProductId" class="text-danger small"></span>
+                                    </td>
+                                    <td>
+                                        <input asp-for="Items[i].Quantity" class="form-control quantity-input" type="number" min="0" onchange="calculateTotal(this)" />
+                                        <div class="stock-info text-muted small"></div>
+                                        <span asp-validation-for="Items[@i].Quantity" class="text-danger small"></span>
+                                    </td>
+                                    <td>
+                                        <span class="price-display">Rp 0</span>
+                                        <input type="hidden" class="unit-price" value="0" />
+                                    </td>
+                                    <td>
+                                        <span class="total-display font-weight-bold">Rp 0</span>
+                                        <input type="hidden" class="item-total" value="0" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)" title="Hapus Baris">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+                                <td><strong id="grandTotal">Rp 0</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Simpan Perubahan
+            </button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                <i class="fas fa-eye"></i> Lihat Detail
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        let rowIndex = @Model.Items.Count;
+
+        async function updatePrice(selectElement) {
+            const productId = selectElement.value;
+            const row = selectElement.closest('tr');
+            const priceDisplay = row.querySelector('.price-display');
+            const unitPriceInput = row.querySelector('.unit-price');
+            const quantityInput = row.querySelector('.quantity-input');
+            const stockInfo = row.querySelector('.stock-info');
+
+            if (productId) {
+                try {
+                    const response = await fetch(`/Data_Transaksi/GetProductPrice?productId=${productId}`);
+                    const data = await response.json();
+
+                    priceDisplay.textContent = `Rp ${data.price.toLocaleString('id-ID')}`;
+                    unitPriceInput.value = data.price;
+                    stockInfo.textContent = `Stock: ${data.stock}`;
+                    quantityInput.max = data.stock;
+
+                    // Recalculate total for this row
+                    calculateTotal(quantityInput);
+                } catch (error) {
+                    console.error('Error fetching product price:', error);
+                    priceDisplay.textContent = 'Rp 0';
+                    unitPriceInput.value = 0;
+                    stockInfo.textContent = '';
+                    quantityInput.max = '';
+                }
+            } else {
+                priceDisplay.textContent = 'Rp 0';
+                unitPriceInput.value = 0;
+                stockInfo.textContent = '';
+                quantityInput.max = '';
+                calculateTotal(quantityInput);
+            }
+        }
+
+        function calculateTotal(inputElement) {
+            const row = inputElement.closest('tr');
+            const quantity = parseInt(row.querySelector('.quantity-input').value) || 0;
+            const unitPrice = parseInt(row.querySelector('.unit-price').value) || 0;
+            const total = quantity * unitPrice;
+
+            row.querySelector('.total-display').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+            row.querySelector('.item-total').value = total;
+
+            updateGrandTotal();
+        }
+
+        function updateGrandTotal() {
+            let grandTotal = 0;
+            document.querySelectorAll('.item-total').forEach(input => {
+                grandTotal += parseInt(input.value) || 0;
+            });
+            document.getElementById('grandTotal').textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+        }
+
+        function addNewRow() {
+            const tbody = document.getElementById('productTableBody');
+            const newRow = document.createElement('tr');
+            newRow.className = 'product-row';
+            newRow.setAttribute('data-row-index', rowIndex);
+
+            newRow.innerHTML = `
+                        <td>
+                            <select name="Items[${rowIndex}].ProductId" class="form-select product-select" onchange="updatePrice(this)">
+                                <option value="">-- Pilih Produk --</option>
+        @foreach (var product in ViewBag.Products as SelectList)
+        {
+                                            <option value="@product.Value">@product.Text</option>
+        }
+                            </select>
+                        </td>
+                        <td>
+                            <input name="Items[${rowIndex}].Quantity" class="form-control quantity-input" type="number" min="0" onchange="calculateTotal(this)" />
+                            <div class="stock-info text-muted small"></div>
+                        </td>
+                        <td>
+                            <span class="price-display">Rp 0</span>
+                            <input type="hidden" class="unit-price" value="0" />
+                        </td>
+                        <td>
+                            <span class="total-display font-weight-bold">Rp 0</span>
+                            <input type="hidden" class="item-total" value="0" />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)" title="Hapus Baris">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+
+            tbody.appendChild(newRow);
+            rowIndex++;
+
+            // Re-index all rows to maintain proper form binding
+            reindexRows();
+
+            // Re-parse validation for new elements
+            if (typeof $.validator !== 'undefined') {
+                $.validator.unobtrusive.parse('#transactionForm');
+            }
+        }
+
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+
+            // Re-index all rows to maintain proper form binding
+            reindexRows();
+
+            // Update grand total
+            updateGrandTotal();
+        }
+
+        function reindexRows() {
+            const rows = document.querySelectorAll('#productTableBody .product-row');
+            rows.forEach((row, index) => {
+                // Update data attribute
+                row.setAttribute('data-row-index', index);
+
+                // Update form field names
+                const select = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+
+                if (select) {
+                    select.name = `Items[${index}].ProductId`;
+                }
+                if (quantityInput) {
+                    quantityInput.name = `Items[${index}].Quantity`;
+                }
+            });
+
+            // Update rowIndex to be the next available index
+            rowIndex = rows.length;
+        }
+
+        // Initialize calculations on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('.product-row');
+            rows.forEach((row) => {
+                const selectElement = row.querySelector('.product-select');
+                if (selectElement && selectElement.value) {
+                    updatePrice(selectElement);
+                }
+            });
+
+            // Initial grand total calculation
+            updateGrandTotal();
+        });
+
+        // Form submission validation
+        document.getElementById('transactionForm').addEventListener('submit', function (e) {
+            const rows = document.querySelectorAll('.product-row');
+            let hasValidItems = false;
+
+            rows.forEach(row => {
+                const productSelect = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+
+                if (productSelect.value && quantityInput.value > 0) {
+                    hasValidItems = true;
+                }
+            });
+
+            if (!hasValidItems) {
+                e.preventDefault();
+                alert('Silakan tambahkan minimal satu produk dengan quantity yang valid.');
+                return false;
+            }
+
+            // Confirm edit action
+            if (!confirm('Apakah Anda yakin ingin menyimpan perubahan transaksi ini?')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+}
+
+<style>
+    .product-row {
+        transition: background-color 0.2s;
+    }
+
+        .product-row:hover {
+            background-color: #f8f9fa;
+        }
+
+    .stock-info {
+        font-size: 0.8em;
+        margin-top: 2px;
+    }
+
+    .price-display, .total-display {
+        font-weight: 500;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-select, .form-control {
+        border-radius: 0.375rem;
+    }
+
+    .text-danger.small {
+        font-size: 0.8em;
+    }
+
+    .alert {
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+</style>
+
+@*
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Data_Transaksi
+
+@{
+    ViewData["Title"] = "Edit Transaksi";
+}
+
+<div class="container">
     <div class="row">
         <div class="col-md-8">
             <form asp-action="Edit">
@@ -15,7 +366,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Edit Informasi Transaksi</h5>
+                        <h5 class="card-title mb-0">Edit Transaksi #@Model.Id</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">

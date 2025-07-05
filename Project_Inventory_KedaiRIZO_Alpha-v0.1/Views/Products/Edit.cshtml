@@ -1,4 +1,5 @@
-﻿@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product
+﻿
+@model Project_Inventory_KedaiRIZO_Alpha_v0._1.Models.Product
 @{
     ViewData["Title"] = "Edit Product";
 }
@@ -86,10 +87,7 @@
                                     <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
                                         <i class="fas fa-arrow-left me-2"></i>Back to List
                                     </a>
-                                    <div class="d-grid gap-2 d-md-flex">
-                                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info btn-lg me-md-2 px-4">
-                                            <i class="fas fa-eye me-2"></i>View Details
-                                        </a>
+                                    <div class="d-grid gap-2 d-md-flex">                                      
                                         <button type="submit" class="btn btn-warning btn-lg px-5">
                                             <i class="fas fa-save me-2"></i>Save Changes
                                         </button>

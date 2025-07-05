@@ -5,6 +5,82 @@
     ViewData["Title"] = "Log in";
 }
 
+<div class="container min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+        <div class="card shadow rounded-4 border-0">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4 fw-semibold">@ViewData["Title"]</h2>
+                <form id="account" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" aria-required="true" />
+                        <label asp-for="Input.Email">Email</label>
+                        <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" type="password" autocomplete="current-password" placeholder="Password" aria-required="true" />
+                        <label asp-for="Input.Password">Password</label>
+                        <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        <label class="form-check-label" asp-for="Input.RememberMe">
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+
+                    <button id="login-submit" type="submit" class="btn btn-primary w-100 mb-3">Log in</button>
+
+                    <div class="text-center small">
+                        <p class="mb-1"><a asp-page="./ForgotPassword">Lupa password?</a></p>
+                        <p class="mb-1"><a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register sebagai user baru</a></p>
+                        <p><a asp-page="./ResendEmailConfirmation">Kirim ulang email konfirmasi</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        {
+            <div class="card shadow rounded-4 border-0 mt-4">
+                <div class="card-body p-4">
+                    <h5 class="text-center mb-3">Or log in with</h5>
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        @foreach (var provider in Model.ExternalLogins!)
+                        {
+                            <button type="submit" class="btn btn-outline-secondary w-100 mb-2" name="provider" value="@provider.Name">
+                                @provider.DisplayName
+                            </button>
+                        }
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mt-4 text-center">
+                No external authentication services configured. See this
+                <a href="https://go.microsoft.com/fwlink/?LinkID=532715" class="alert-link">article</a>.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@*
+    @page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
 <h1>@ViewData["Title"]</h1>
 <div class="row">
     <div class="col-md-4">
@@ -80,4 +156,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
+}*@
