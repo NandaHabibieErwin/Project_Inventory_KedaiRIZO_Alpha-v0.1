@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.Style;
+using OfficeOpenXml;
 using Project_Inventory_KedaiRIZO_Alpha_v0._1.Data;
 using Project_Inventory_KedaiRIZO_Alpha_v0._1.Models;
 
@@ -422,6 +425,332 @@ namespace Project_Inventory_KedaiRIZO_Alpha_v0._1.Controllers
             });
 
             return Json(details);
+        }
+
+        [HttpGet]
+        [HttpGet]
+        public async Task<IActionResult> ExportToExcel(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            try
+            {
+                // Set default date range if not provided
+                if (!startDate.HasValue)
+                    startDate = DateTime.Now.AddMonths(-1);
+                if (!endDate.HasValue)
+                    endDate = DateTime.Now;
+
+                // Get transaction data with ALL required includes
+                var transactions = await _context.Data_Transaksi
+                    .Include(d => d.ApplicationUser)
+                    .Include(d => d.Details)
+                        .ThenInclude(dt => dt.Product)
+                            .ThenInclude(p => p.Kategori) // Add this missing include
+                    .Where(d => d.Tanggal >= startDate && d.Tanggal <= endDate)
+                    .OrderByDescending(d => d.Tanggal)
+                    .AsNoTracking() // Add this for better performance
+                    .ToListAsync();
+
+                // Get product data with category
+                var products = await _context.Product
+                    .Include(p => p.Kategori) // Add this missing include
+                    .OrderBy(p => p.Product_Name)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                // Debug: Check if data is loaded
+                System.Diagnostics.Debug.WriteLine($"Loaded {transactions.Count} transactions");
+                foreach (var trans in transactions.Take(3))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Transaction {trans.Id}: User={trans.ApplicationUser?.UserName}, Details={trans.Details?.Count}");
+                }
+
+                // Create Excel package
+                using var package = new ExcelPackage();
+
+                // Create Transaction Summary Sheet
+                CreateTransactionSummarySheet(package, transactions, startDate.Value, endDate.Value);
+
+                // Create Transaction Details Sheet
+                CreateTransactionDetailsSheet(package, transactions);
+
+                // Create Product List Sheet
+                CreateProductListSheet(package, products);
+
+                // Create Statistics Sheet
+                CreateStatisticsSheet(package, transactions, products);
+
+                // Generate file
+                var fileName = $"KedaiRIZO_Report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                var fileBytes = package.GetAsByteArray();
+
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                // Add more detailed error logging
+                System.Diagnostics.Debug.WriteLine($"Export error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                TempData["ErrorMessage"] = $"Gagal mengekspor data: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        private void CreateTransactionSummarySheet(ExcelPackage package, List<Data_Transaksi> transactions, DateTime startDate, DateTime endDate)
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Transaction Summary");
+
+            // Header
+            worksheet.Cells["A1:G1"].Merge = true;
+            worksheet.Cells["A1"].Value = "LAPORAN TRANSAKSI KEDAI RIZO";
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            worksheet.Cells["A2:G2"].Merge = true;
+            worksheet.Cells["A2"].Value = $"Period: {startDate:dd/MM/yyyy} - {endDate:dd/MM/yyyy}";
+            worksheet.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            // Column headers
+            worksheet.Cells["A4"].Value = "Transaction ID";
+            worksheet.Cells["B4"].Value = "Date";
+            worksheet.Cells["C4"].Value = "User";
+            worksheet.Cells["D4"].Value = "Items Count";
+            worksheet.Cells["E4"].Value = "Total Qty";
+            worksheet.Cells["F4"].Value = "Total Amount";
+            worksheet.Cells["G4"].Value = "Status";
+
+            // Style headers
+            using (var range = worksheet.Cells["A4:G4"])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            }
+
+            // Data rows
+            int row = 5;
+            foreach (var transaction in transactions)
+            {
+                worksheet.Cells[row, 1].Value = transaction.Id;
+                worksheet.Cells[row, 2].Value = transaction.Tanggal.ToString("dd/MM/yyyy HH:mm");
+                worksheet.Cells[row, 3].Value = transaction.ApplicationUser?.UserName ?? "Unknown";
+                worksheet.Cells[row, 4].Value = transaction.Details?.Count ?? 0;
+                worksheet.Cells[row, 5].Value = transaction.Details?.Sum(d => d.Quantity) ?? 0;
+                worksheet.Cells[row, 6].Value = transaction.TotalAmount;
+                worksheet.Cells[row, 6].Style.Numberformat.Format = "#,##0";
+                worksheet.Cells[row, 7].Value = "Completed";
+
+                row++;
+            }
+
+            // Auto-fit columns
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+        }
+
+        private void CreateTransactionDetailsSheet(ExcelPackage package, List<Data_Transaksi> transactions)
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Transaction Details");
+
+            // Header
+            worksheet.Cells["A1:H1"].Merge = true;
+            worksheet.Cells["A1"].Value = "DETAIL TRANSAKSI";
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            // Column headers
+            worksheet.Cells["A3"].Value = "Transaction ID";
+            worksheet.Cells["B3"].Value = "Date";
+            worksheet.Cells["C3"].Value = "User";
+            worksheet.Cells["D3"].Value = "Product Name";
+            worksheet.Cells["E3"].Value = "Quantity";
+            worksheet.Cells["F3"].Value = "Unit Price";
+            worksheet.Cells["G3"].Value = "Subtotal";
+            worksheet.Cells["H3"].Value = "Product Category";
+
+            // Style headers
+            using (var range = worksheet.Cells["A3:H3"])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            }
+
+            // Data rows
+            int row = 4;
+            foreach (var transaction in transactions)
+            {
+                foreach (var detail in transaction.Details ?? new List<Detail_Transaksi>())
+                {
+                    worksheet.Cells[row, 1].Value = transaction.Id;
+                    worksheet.Cells[row, 2].Value = transaction.Tanggal.ToString("dd/MM/yyyy HH:mm");
+                    worksheet.Cells[row, 3].Value = transaction.ApplicationUser?.UserName ?? "Unknown";
+                    worksheet.Cells[row, 4].Value = detail.Product?.Product_Name ?? "Unknown Product";
+                    worksheet.Cells[row, 5].Value = detail.Quantity;
+                    worksheet.Cells[row, 6].Value = detail.Product?.harga ?? 0;
+                    worksheet.Cells[row, 6].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 7].Value = detail.total;
+                    worksheet.Cells[row, 7].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 8].Value = detail.Product?.Kategori.Nama_Kategori ?? "Unknown";
+
+                    row++;
+                }
+            }
+
+            // Auto-fit columns
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+        }
+
+        private void CreateProductListSheet(ExcelPackage package, List<Product> products)
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Product List");
+
+            // Header
+            worksheet.Cells["A1:F1"].Merge = true;
+            worksheet.Cells["A1"].Value = "DAFTAR PRODUK";
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            // Column headers
+            worksheet.Cells["A3"].Value = "Product ID";
+            worksheet.Cells["B3"].Value = "Product Name";
+            worksheet.Cells["C3"].Value = "Category";
+            worksheet.Cells["D3"].Value = "Price";
+            worksheet.Cells["E3"].Value = "Stock";
+            worksheet.Cells["F3"].Value = "Status";
+
+            // Style headers
+            using (var range = worksheet.Cells["A3:F3"])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
+                range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            }
+
+            // Data rows
+            int row = 4;
+            foreach (var product in products)
+            {
+                worksheet.Cells[row, 1].Value = product.Id;
+                worksheet.Cells[row, 2].Value = product.Product_Name;
+                worksheet.Cells[row, 3].Value = product.Kategori?.Nama_Kategori ?? "Unknown";
+                worksheet.Cells[row, 4].Value = product.harga;
+                worksheet.Cells[row, 4].Style.Numberformat.Format = "#,##0";
+                worksheet.Cells[row, 5].Value = product.stock;
+                worksheet.Cells[row, 6].Value = product.stock > 0 ? "In Stock" : "Out of Stock";
+
+                // Color code based on stock
+                if (product.stock <= 5)
+                {
+                    worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
+                }
+                else if (product.stock <= 10)
+                {
+                    worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.LightGoldenrodYellow);
+                }
+
+                row++;
+            }
+
+            // Auto-fit columns
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+        }
+
+        private void CreateStatisticsSheet(ExcelPackage package, List<Data_Transaksi> transactions, List<Product> products)
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Statistics");
+
+            // Header
+            worksheet.Cells["A1:D1"].Merge = true;
+            worksheet.Cells["A1"].Value = "STATISTIK & RINGKASAN";
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            int row = 3;
+
+            // Transaction Statistics
+            worksheet.Cells[row, 1].Value = "TRANSACTION STATISTICS";
+            worksheet.Cells[row, 1].Style.Font.Bold = true;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Total Transactions:";
+            worksheet.Cells[row, 2].Value = transactions.Count;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Total Revenue:";
+            worksheet.Cells[row, 2].Value = transactions.Sum(t => t.TotalAmount);
+            worksheet.Cells[row, 2].Style.Numberformat.Format = "#,##0";
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Average Transaction Value:";
+            worksheet.Cells[row, 2].Value = transactions.Count > 0 ? transactions.Average(t => t.TotalAmount) : 0;
+            worksheet.Cells[row, 2].Style.Numberformat.Format = "#,##0";
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Total Items Sold:";
+            worksheet.Cells[row, 2].Value = transactions.SelectMany(t => t.Details ?? new List<Detail_Transaksi>()).Sum(d => d.Quantity);
+            row += 2;
+
+            // Product Statistics
+            worksheet.Cells[row, 1].Value = "PRODUCT STATISTICS";
+            worksheet.Cells[row, 1].Style.Font.Bold = true;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Total Products:";
+            worksheet.Cells[row, 2].Value = products.Count;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Products in Stock:";
+            worksheet.Cells[row, 2].Value = products.Count(p => p.stock > 0);
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Products Out of Stock:";
+            worksheet.Cells[row, 2].Value = products.Count(p => p.stock == 0);
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Low Stock Products (≤5):";
+            worksheet.Cells[row, 2].Value = products.Count(p => p.stock <= 5 && p.stock > 0);
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Total Stock Value:";
+            worksheet.Cells[row, 2].Value = products.Sum(p => p.stock * p.harga);
+            worksheet.Cells[row, 2].Style.Numberformat.Format = "#,##0";
+            row += 2;
+
+            // Top Products
+            var topProducts = transactions
+                .SelectMany(t => t.Details ?? new List<Detail_Transaksi>())
+                .GroupBy(d => d.Product?.Product_Name ?? "Unknown")
+                .Select(g => new { ProductName = g.Key, TotalSold = g.Sum(d => d.Quantity) })
+                .OrderByDescending(p => p.TotalSold)
+                .Take(5)
+                .ToList();
+
+            worksheet.Cells[row, 1].Value = "TOP 5 BEST SELLING PRODUCTS";
+            worksheet.Cells[row, 1].Style.Font.Bold = true;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Product Name";
+            worksheet.Cells[row, 2].Value = "Total Sold";
+            worksheet.Cells[row, 1].Style.Font.Bold = true;
+            worksheet.Cells[row, 2].Style.Font.Bold = true;
+            row++;
+
+            foreach (var product in topProducts)
+            {
+                worksheet.Cells[row, 1].Value = product.ProductName;
+                worksheet.Cells[row, 2].Value = product.TotalSold;
+                row++;
+            }
+
+            // Auto-fit columns
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
         }
 
         private bool Data_TransaksiExists(int id)
